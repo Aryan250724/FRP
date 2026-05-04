@@ -36,6 +36,8 @@ h1, h2, h3 {color: #FFFFFF;}
 # Title
 # -----------------------------
 st.title("Proactive Carbon Intelligence Dashboard")
+st.caption("Developed By GROUP-13")
+
 st.info("Predict power output, estimate CO₂ emissions, and detect anomalies in real-time.")
 
 # -----------------------------
