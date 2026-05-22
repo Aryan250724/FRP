@@ -2,116 +2,348 @@ import streamlit as st
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
+import seaborn as sns
+from streamlit_autorefresh import st_autorefresh
 
-# -----------------------------
-# Page Config
-# -----------------------------
-st.set_page_config(page_title="Carbon Intelligence Dashboard", layout="wide")
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 
-# -----------------------------
-# Load Data
-# -----------------------------
+st.set_page_config(
+    page_title="Carbon Intelligence Dashboard",
+    layout="wide"
+)
+
+# =========================================================
+# AUTO REFRESH
+# =========================================================
+
+st_autorefresh(interval=3000, key="refresh")
+
+# =========================================================
+# LOAD MODEL & DATA
+# =========================================================
+
 model = joblib.load("power_model.pkl")
-df = pd.read_csv("anomaly_results.csv")
 
-# -----------------------------
-# Custom Styling (UI Upgrade)
-# -----------------------------
+df = pd.read_csv(
+    "final_carbon_monitoring_dataset.csv"
+)
+
+# =========================================================
+# CUSTOM CSS
+# =========================================================
+
 st.markdown("""
 <style>
-.main {background-color: #0e1117;}
-h1, h2, h3 {color: #FFFFFF;}
-.block-container {padding-top: 2rem;}
 
-.card {
+.main {
+    background-color: #0E1117;
+}
+
+.block-container {
+    padding-top: 2rem;
+}
+
+h1, h2, h3 {
+    color: white;
+}
+
+.stMetric {
     background-color: #1c1f26;
     padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    text-align: center;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# Title
-# -----------------------------
-st.title("Proactive Carbon Intelligence Dashboard")
-st.caption("Developed By GROUP-13")
+# =========================================================
+# TITLE
+# =========================================================
 
-st.info("Predict power output, estimate CO₂ emissions, and detect anomalies in real-time.")
+st.title("Proactive Caerbon Intelligence Dashboard")
+
+st.caption(
+    "Developed by Group 13 "
+)
+
+st.info(
+    "Machine learning system for power prediction, CO₂ estimation, anomaly detection, and operational optimization."
+)
+
+# =========================================================
+# MODEL INFO
+# =========================================================
+
+st.success(
+    "Prediction Engine: Gradient Boosting Regressor"
+)
+
+# =========================================================
+# INPUT + RESULT SECTION
+# =========================================================
+
+col1, col2 = st.columns([1,1])
 
 # -----------------------------
-# Layout Columns
+# INPUTS
 # -----------------------------
-col1, col2 = st.columns([1, 1])
 
-# -----------------------------
-# LEFT SIDE → INPUT
-# -----------------------------
 with col1:
+
     st.header("Input Parameters")
 
-    at = st.slider("Temperature (AT)", float(df['AT'].min()), float(df['AT'].max()), 25.0)
-    v  = st.slider("Vacuum (V)", float(df['V'].min()), float(df['V'].max()), 50.0)
-    ap = st.slider("Pressure (AP)", float(df['AP'].min()), float(df['AP'].max()), 1010.0)
-    rh = st.slider("Humidity (RH)", float(df['RH'].min()), float(df['RH'].max()), 60.0)
+    at = st.slider(
+        "Ambient Temperature (AT)",
+        float(df['AT'].min()),
+        float(df['AT'].max()),
+        25.0
+    )
 
-    input_data = pd.DataFrame([[at, v, ap, rh]], columns=['AT','V','AP','RH'])
+    v = st.slider(
+        "Exhaust Vacuum (V)",
+        float(df['V'].min()),
+        float(df['V'].max()),
+        50.0
+    )
 
-    pred_pe = model.predict(input_data)[0]
-    pred_co2 = pred_pe * 0.82
+    ap = st.slider(
+        "Ambient Pressure (AP)",
+        float(df['AP'].min()),
+        float(df['AP'].max()),
+        1010.0
+    )
 
-# -----------------------------
-# RIGHT SIDE → RESULTS (CARDS)
-# -----------------------------
+    rh = st.slider(
+        "Relative Humidity (RH)",
+        float(df['RH'].min()),
+        float(df['RH'].max()),
+        60.0
+    )
+
+# =========================================================
+# PREDICTION
+# =========================================================
+
+input_data = pd.DataFrame(
+    [[at, v, ap, rh]],
+    columns=['AT', 'V', 'AP', 'RH']
+)
+
+pred_pe = model.predict(input_data)[0]
+
+pred_co2 = pred_pe * 0.82
+
+# =========================================================
+# RESULTS
+# =========================================================
+
 with col2:
+
     st.header("Prediction Results")
 
-    c1, c2 = st.columns(2)
+    k1, k2 = st.columns(2)
 
-    c1.metric("Power Output", f"{pred_pe:.2f}")
-    c2.metric("CO₂ Emission", f"{pred_co2:.2f}")
+    k1.metric(
+        "Predicted Power Output",
+        f"{pred_pe:.2f}"
+    )
+
+    k2.metric(
+        "Estimated CO₂",
+        f"{pred_co2:.2f}"
+    )
 
     if pred_co2 > 380:
-        st.error("High Emission ⚠️")
+
+        st.error("High Emission Level ⚠️")
+
     elif pred_co2 > 360:
-        st.warning("Moderate Emission ⚡")
+
+        st.warning("Moderate Emission Level ⚡")
+
     else:
-        st.success("Low Emission ✅")
 
-# -----------------------------
-# ANOMALY GRAPH
-# -----------------------------
-st.header("Anomaly Detection")
+        st.success("Low Emission Level ✅")
 
-fig, ax = plt.subplots(figsize=(10,4))
+# =========================================================
+# LIVE SYSTEM MONITORING
+# =========================================================
 
-normal = df[df['Anomaly'] == 1]
-anomaly = df[df['Anomaly'] == -1]
+st.header("Live System Monitoring")
 
-ax.scatter(normal.index, normal['CO2'], s=5, alpha=0.5, label="Normal")
-ax.scatter(anomaly.index, anomaly['CO2'], s=25, color='red', label="Anomaly")
+st.write(
+    "Simulated real-time operational readings using historical plant data."
+)
 
-ax.set_title("CO₂ Emission Anomalies")
-ax.set_xlabel("Index")
-ax.set_ylabel("CO₂")
-ax.legend()
+latest = df.sample(1).iloc[0]
 
-st.pyplot(fig)
+c1, c2, c3, c4 = st.columns(4)
 
-# Show anomaly count
-st.info(f"Total anomalies detected: {len(anomaly)}")
+c1.metric(
+    "Current CO₂",
+    f"{latest['CO2']:.2f}"
+)
 
-# -----------------------------
+c2.metric(
+    "Current Power",
+    f"{latest['PE']:.2f}"
+)
+
+c3.metric(
+    "Current Temperature",
+    f"{latest['AT']:.2f}"
+)
+
+if latest['Anomaly'] == -1:
+
+    c4.error("Anomaly Detected")
+
+else:
+
+    c4.success("System Normal")
+
+# =========================================================
+# CO2 TREND + ANOMALIES
+# =========================================================
+
+st.header("CO₂ Emission Trend & Anomaly Detection")
+
+sample_df = df.head(300)
+
+fig1, ax1 = plt.subplots(figsize=(14,5))
+
+# CO2 Trend
+ax1.plot(
+    sample_df.index,
+    sample_df['CO2'],
+    color='blue',
+    linewidth=2,
+    label='CO₂ Trend'
+)
+
+# Anomaly Points
+anomaly_points = sample_df[
+    sample_df['Anomaly'] == -1
+]
+
+ax1.scatter(
+    anomaly_points.index,
+    anomaly_points['CO2'],
+    color='red',
+    s=120,
+    label='Detected Anomaly',
+    zorder=5
+)
+
+ax1.set_title(
+    "CO₂ Emission Trend with Detected Anomalies"
+)
+
+ax1.set_xlabel("Time Index")
+
+ax1.set_ylabel("CO₂ Emission")
+
+ax1.legend()
+
+ax1.grid(True, alpha=0.3)
+
+st.pyplot(fig1)
+
+st.info(
+    "Red points indicate abnormal emission behavior detected using Isolation Forest."
+)
+
+# =========================================================
+# ACTUAL vs PREDICTED
+# =========================================================
+
+st.header("Actual vs Predicted Power Output")
+
+sample_df2 = df.head(80)
+
+fig2, ax2 = plt.subplots(figsize=(14,5))
+
+ax2.plot(
+    sample_df2.index,
+    sample_df2['PE'],
+    linewidth=3,
+    label='Actual Output'
+)
+
+ax2.plot(
+    sample_df2.index,
+    sample_df2['Predicted_PE'],
+    linestyle='--',
+    linewidth=3,
+    label='Predicted Output'
+)
+
+ax2.set_title(
+    "Model Prediction Performance"
+)
+
+ax2.set_xlabel("Time Index")
+
+ax2.set_ylabel("Power Output")
+
+ax2.legend()
+
+ax2.grid(True, alpha=0.3)
+
+st.pyplot(fig2)
+
+st.info(
+    "The predicted curve closely follows the actual curve, indicating strong model performance."
+)
+
+# =========================================================
+# HEATMAP
+# =========================================================
+
+st.header("Feature Correlation Heatmap")
+
+fig3, ax3 = plt.subplots(figsize=(8,5))
+
+corr = df[
+    ['AT', 'V', 'AP', 'RH', 'PE', 'CO2']
+].corr()
+
+sns.heatmap(
+    corr,
+    annot=True,
+    cmap='coolwarm',
+    ax=ax3
+)
+
+st.pyplot(fig3)
+
+# =========================================================
 # OPTIMIZATION
-# -----------------------------
-st.header("Optimal Conditions")
+# =========================================================
 
-opt_col1, opt_col2, opt_col3, opt_col4 = st.columns(4)
+st.header("Optimal Conditions for Minimum CO₂")
 
-opt_col1.metric("AT", "30.92")
-opt_col2.metric("V", "71.84")
-opt_col3.metric("AP", "1021.40")
-opt_col4.metric("RH", "92.07")
+o1, o2, o3, o4 = st.columns(4)
+
+o1.metric("AT", "30.92")
+
+o2.metric("V", "71.84")
+
+o3.metric("AP", "1021.40")
+
+o4.metric("RH", "92.07")
 
 st.success("Minimum CO₂ ≈ 351")
+
+# =========================================================
+# FOOTER
+# =========================================================
+
+st.markdown("---")
+
+st.caption(
+    "Simulated real-time intelligent carbon monitoring system using machine learning."
+)
