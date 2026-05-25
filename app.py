@@ -10,7 +10,7 @@ from streamlit_autorefresh import st_autorefresh
 # =========================================================
 
 st.set_page_config(
-    page_title="Carbon Intelligence Dashboard",
+    page_title="Proactive Carbon Intelligence",
     layout="wide"
 )
 
@@ -18,7 +18,7 @@ st.set_page_config(
 # AUTO REFRESH
 # =========================================================
 
-st_autorefresh(interval=3000, key="refresh")
+st_autorefresh(interval=5000, key="refresh")
 
 # =========================================================
 # LOAD MODEL & DATA
@@ -31,29 +31,73 @@ df = pd.read_csv(
 )
 
 # =========================================================
-# CUSTOM CSS
+# FINAL MODERN THEME
 # =========================================================
 
 st.markdown("""
 <style>
 
+html, body, [class*="css"] {
+    background-color: #071122;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+}
+
 .main {
-    background-color: #0E1117;
+    background: linear-gradient(180deg, #071122 0%, #0b1730 100%);
 }
 
 .block-container {
-    padding-top: 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    max-width: 100%;
 }
 
-h1, h2, h3 {
-    color: white;
+h1 {
+    color: white !important;
+    font-size: 42px !important;
+    font-weight: 700 !important;
+}
+
+h2, h3 {
+    color: white !important;
+}
+
+p, label, div {
+    color: #d6e2f0;
 }
 
 .stMetric {
-    background-color: #1c1f26;
-    padding: 15px;
-    border-radius: 12px;
+    background: linear-gradient(145deg, #0f1d3b, #13274d);
+    padding: 18px;
+    border-radius: 18px;
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.25);
+}
+
+[data-testid="stMetricValue"] {
+    color: white;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #9fb3d1;
+    font-size: 15px;
+}
+
+.stAlert {
+    border-radius: 14px;
+}
+
+.stDataFrame {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+hr {
+    border-color: rgba(255,255,255,0.08);
 }
 
 </style>
@@ -63,10 +107,10 @@ h1, h2, h3 {
 # TITLE
 # =========================================================
 
-st.title("Proactive Caerbon Intelligence Dashboard")
+st.title(" Proactive Carbon Intelligence Dashboard")
 
 st.caption(
-    "Developed by Group 13 "
+    "ML-Based Emission Forecasting, Anomaly Detection & Sustainability Analytics"
 )
 
 st.info(
@@ -87,9 +131,9 @@ st.success(
 
 col1, col2 = st.columns([1,1])
 
-# -----------------------------
+# =========================================================
 # INPUTS
-# -----------------------------
+# =========================================================
 
 with col1:
 
@@ -172,7 +216,7 @@ with col2:
 # LIVE SYSTEM MONITORING
 # =========================================================
 
-st.header("Live System Monitoring")
+st.header("System Monitoring Simulation")
 
 st.write(
     "Simulated real-time operational readings using historical plant data."
@@ -209,18 +253,21 @@ else:
 # CO2 TREND + ANOMALIES
 # =========================================================
 
-st.header("CO₂ Emission Trend & Anomaly Detection")
+st.header(" CO₂ Emission Trend & Anomaly Detection")
 
 sample_df = df.head(300)
 
 fig1, ax1 = plt.subplots(figsize=(14,5))
 
+fig1.patch.set_facecolor('#0f1d3b')
+ax1.set_facecolor('#1a2742')
+
 # CO2 Trend
 ax1.plot(
     sample_df.index,
     sample_df['CO2'],
-    color='blue',
-    linewidth=2,
+    color='#00d4aa',
+    linewidth=2.5,
     label='CO₂ Trend'
 )
 
@@ -239,16 +286,25 @@ ax1.scatter(
 )
 
 ax1.set_title(
-    "CO₂ Emission Trend with Detected Anomalies"
+    "CO₂ Emission Trend with Detected Anomalies",
+    color='white'
 )
 
-ax1.set_xlabel("Time Index")
+ax1.set_xlabel(
+    "Time Index",
+    color='white'
+)
 
-ax1.set_ylabel("CO₂ Emission")
+ax1.set_ylabel(
+    "CO₂ Emission",
+    color='white'
+)
+
+ax1.tick_params(colors='white')
 
 ax1.legend()
 
-ax1.grid(True, alpha=0.3)
+ax1.grid(True, alpha=0.2)
 
 st.pyplot(fig1)
 
@@ -260,17 +316,21 @@ st.info(
 # ACTUAL vs PREDICTED
 # =========================================================
 
-st.header("Actual vs Predicted Power Output")
+st.header("📊 Actual vs Predicted Power Output")
 
 sample_df2 = df.head(80)
 
 fig2, ax2 = plt.subplots(figsize=(14,5))
 
+fig2.patch.set_facecolor('#0f1d3b')
+ax2.set_facecolor('#1a2742')
+
 ax2.plot(
     sample_df2.index,
     sample_df2['PE'],
     linewidth=3,
-    label='Actual Output'
+    label='Actual Output',
+    color='#00d4aa'
 )
 
 ax2.plot(
@@ -278,20 +338,30 @@ ax2.plot(
     sample_df2['Predicted_PE'],
     linestyle='--',
     linewidth=3,
-    label='Predicted Output'
+    label='Predicted Output',
+    color='#3a86ff'
 )
 
 ax2.set_title(
-    "Model Prediction Performance"
+    "Model Prediction Performance",
+    color='white'
 )
 
-ax2.set_xlabel("Time Index")
+ax2.set_xlabel(
+    "Time Index",
+    color='white'
+)
 
-ax2.set_ylabel("Power Output")
+ax2.set_ylabel(
+    "Power Output",
+    color='white'
+)
+
+ax2.tick_params(colors='white')
 
 ax2.legend()
 
-ax2.grid(True, alpha=0.3)
+ax2.grid(True, alpha=0.2)
 
 st.pyplot(fig2)
 
@@ -303,9 +373,12 @@ st.info(
 # HEATMAP
 # =========================================================
 
-st.header("Feature Correlation Heatmap")
+st.header("🔥 Feature Correlation Heatmap")
 
 fig3, ax3 = plt.subplots(figsize=(8,5))
+
+fig3.patch.set_facecolor('#0f1d3b')
+ax3.set_facecolor('#1a2742')
 
 corr = df[
     ['AT', 'V', 'AP', 'RH', 'PE', 'CO2']
@@ -324,7 +397,7 @@ st.pyplot(fig3)
 # OPTIMIZATION
 # =========================================================
 
-st.header("Optimal Conditions for Minimum CO₂")
+st.header(" Optimal Conditions for Minimum CO₂")
 
 o1, o2, o3, o4 = st.columns(4)
 
@@ -345,5 +418,5 @@ st.success("Minimum CO₂ ≈ 351")
 st.markdown("---")
 
 st.caption(
-    "Simulated real-time intelligent carbon monitoring system using machine learning."
+    "Proactive AI-driven industrial sustainability monitoring framework using Gradient Boosting and Isolation Forest."
 )
