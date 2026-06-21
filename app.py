@@ -1,3 +1,5 @@
+import traceback
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -23,13 +25,14 @@ st_autorefresh(interval=5000, key="refresh")
 # =========================================================
 # LOAD MODEL & DATA
 # =========================================================
+try:
+    model = joblib.load("power_model.pkl")
+except Exception as e:
+    st.error(f"Model Loading Error: {e}")
+    st.code(traceback.format_exc())
+    st.stop()
 
-model = joblib.load("power_model.pkl")
-
-df = pd.read_csv(
-    "final_carbon_monitoring_dataset.csv"
-)
-
+df = pd.read_csv("final_carbon_monitoring_dataset.csv")
 # =========================================================
 # FINAL MODERN THEME
 # =========================================================
